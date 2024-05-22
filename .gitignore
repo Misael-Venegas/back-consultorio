@@ -1,0 +1,6 @@
+#Dependencias
+/node_modules
+
+# local env files
+.env*.local
+package-lock.json
