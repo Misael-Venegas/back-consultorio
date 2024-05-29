@@ -1,5 +1,5 @@
 const express = require('express')
-
+const {db} =require ( './coonfig/bd.config')
 const app = express()
 const port = 3001
 

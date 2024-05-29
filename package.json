@@ -2,7 +2,7 @@
   "name": "back-consultorio",
   "version": "1.0.0",
   "description": "Back para las peticiones de eyeconic",
-  "main": "./src/app.js",
+  "main": "./src/index.js",
   "scripts": {
     "test": "dev",
     "dev": "nodemon ./src"
@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "pg-promise": "^11.7.8"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
