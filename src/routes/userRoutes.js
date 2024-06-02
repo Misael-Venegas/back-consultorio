@@ -1,13 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const { db } = require('../coonfig/bd.config')
+const { agregarUsuario, obtenerRolesUsuarios, getUsuarios } = require('../controllers/users/users.controller')
 
-router.get('/', async (req, res) => {
-    const respuesta = await db.any(`select * from usuarios.rol`)
-    res.send(respuesta)
-}
-).get('/prueba', (req, res) => {
-    res.send('prueba de rutas secundarias')
-})
+router.post('/agregarUsuario', agregarUsuario)
+    .get('/getRol', obtenerRolesUsuarios)
+    .get('/obtenerUsuarios', getUsuarios)
+
 
 module.exports = router
