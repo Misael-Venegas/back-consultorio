@@ -35,7 +35,7 @@ const agregarUsuario = async (req, res, next) => {
     try {
         const { nombre, aPaterno, aMaterno, correo, telefono, rol, cumpleanhos } = req.body
         const dataUsr = await db.any(`select * from usuarios.users usr where usr.correo = '${correo}'`)
-       
+
         if (dataUsr.length > 0) {
             return next(new AppError('Este correo ya fue registrado con otro usuario', 400))
         }
@@ -64,4 +64,13 @@ const getUsuarios = async (req, res, next) => {
     }
 }
 
-module.exports = { inicarSesion, agregarUsuario, obtenerRolesUsuarios, getUsuarios }
+const deleteUser = async (req, res, next) => {
+    try {
+       
+    } catch (error) {
+        next(new AppError('Al intenr eliminar el usuario ' + error, 500))
+    }
+}
+
+
+module.exports = { inicarSesion, agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser }

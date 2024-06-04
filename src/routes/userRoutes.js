@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const { agregarUsuario, obtenerRolesUsuarios, getUsuarios } = require('../controllers/users/users.controller')
+const { agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser } = require('../controllers/users/users.controller')
 
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
     .get('/obtenerUsuarios', getUsuarios)
+    .post('/eliminarUsuario', deleteUser)
 
 
 module.exports = router
