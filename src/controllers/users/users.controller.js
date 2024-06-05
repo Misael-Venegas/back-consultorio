@@ -53,7 +53,7 @@ const agregarUsuario = async (req, res, next) => {
 
 const getUsuarios = async (req, res, next) => {
     try {
-        const users = await db.any(`select usr.id, CONCAT(usr.nombre,' ', usr.a_paterno,' ',usr.a_materno) nombre, usr.correo, usr.telefono, usr.fecha_cumpleanhos, r.rol from usuarios.users usr
+        const users = await db.any(`select usr.id, usr.nombre, usr.a_paterno,usr.a_materno, usr.correo, usr.telefono, usr.fecha_cumpleanhos, r.rol, usr.id_rol from usuarios.users usr
                                     INNER JOIN usuarios.rol r ON r.id = usr.id_rol	
                                     ORDER BY usr.nombre`
         )
@@ -74,5 +74,17 @@ const deleteUser = async (req, res, next) => {
     }
 }
 
+const editarUsuario = async (req, res, next) => {
+    try {
+        const { id, nombre, aPaterno, aMaterno, correo, telefono, rol, cumpleanhos } = req.body
+        await db.oneOrNone(`UPDATE usuarios.users SET nombre='${nombre}', a_paterno='${aPaterno}', a_materno='${aMaterno}', correo='${correo}',
+        telefono='${telefono}', id_rol='${rol}', fecha_cumpleanhos='${cumpleanhos}' WHERE id='${id}'`)
 
-module.exports = { inicarSesion, agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser }
+        return res.status(200).json({ succes: 'ok' })
+    } catch (error) {
+        next(new AppError('Al intenr eliminar el usuario ' + error, 500))
+    }
+}
+
+
+module.exports = { inicarSesion, agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser, editarUsuario }
