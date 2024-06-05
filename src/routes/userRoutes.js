@@ -5,7 +5,7 @@ const { agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser } = requir
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
     .get('/obtenerUsuarios', getUsuarios)
-    .post('/eliminarUsuario', deleteUser)
+    .get('/eliminarUsuario/:idUsuario', deleteUser)
 
 
 module.exports = router

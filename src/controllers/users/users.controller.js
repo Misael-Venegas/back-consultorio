@@ -53,7 +53,7 @@ const agregarUsuario = async (req, res, next) => {
 
 const getUsuarios = async (req, res, next) => {
     try {
-        const users = await db.any(`select CONCAT(usr.nombre,' ', usr.a_paterno,' ',usr.a_materno) nombre, usr.correo, usr.telefono, usr.fecha_cumpleanhos, r.rol from usuarios.users usr
+        const users = await db.any(`select usr.id, CONCAT(usr.nombre,' ', usr.a_paterno,' ',usr.a_materno) nombre, usr.correo, usr.telefono, usr.fecha_cumpleanhos, r.rol from usuarios.users usr
                                     INNER JOIN usuarios.rol r ON r.id = usr.id_rol	
                                     ORDER BY usr.nombre`
         )
@@ -66,7 +66,9 @@ const getUsuarios = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
     try {
-       
+        const { idUsuario } = req.params
+        await db.oneOrNone(`DELETE FROM usuarios.users where id='${idUsuario}'`)
+        return res.status(200).json({ Success: 'Ok' })
     } catch (error) {
         next(new AppError('Al intenr eliminar el usuario ' + error, 500))
     }
