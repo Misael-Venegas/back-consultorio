@@ -1,13 +1,15 @@
 const AppError = require('../../helpers/appError')
 const { generateToken } = require('../../helpers/autenticationToken')
 const { db } = require('../../coonfig/bd.config')
+const bcryptjs = require('bcryptjs')
+const crypto = require('crypto')
 
 const inicarSesion = async (req, res, next) => {
     try {
         const { usuario, contrasena } = req.body;
         if (usuario === 'root') {
             if (contrasena === 'abcd.1234') {
-                const usr = [{ usuario, correo: '', telefono: '', rol: 'root', fechaCumpleanhos: '' }]
+                const usr = { usuario, correo: '', telefono: '', rol: 'root', fechaCumpleanhos: '' }
                 const token = generateToken(usr)
 
                 return res.status(200).json({ token });
@@ -16,6 +18,30 @@ const inicarSesion = async (req, res, next) => {
             }
 
         }
+
+        const usr = await db.oneOrNone(`select * from usuarios.users us WHERE us.correo = '${usuario}'`)
+
+
+        if (!usr) {
+            return next(new AppError('El usuario no existe', 500))
+        }
+
+        const validarContrasebhia = await bcryptjs.compare(contrasena, usr.password)
+        if (validarContrasebhia) {
+            const datosToken = {
+                id: usr.id,
+                nombre: usr.nombre,
+                a_paterno: usr.a_paterno,
+                a_materno: usr.a_materno,
+                correo: usr.correo,
+                telefono: usr.telefono,
+                id_rol: usr.id_rol,
+                fecha_cumpleanhos: usr.fecha_cumpleanhos
+            }
+            const token = generateToken(datosToken)
+            return res.status(200).json({ token });
+        }
+        return next(new AppError('La contraseña es incorrecta', 500))
     } catch (error) {
         next(new AppError('Error interno del servidor', 500));
     }
@@ -40,13 +66,16 @@ const agregarUsuario = async (req, res, next) => {
             return next(new AppError('Este correo ya fue registrado con otro usuario', 400))
         }
 
+        const cadena = crypto.randomBytes(2).toString('hex')
+        const contrasenha = bcryptjs.hashSync(cadena, 8)
+
         await db.oneOrNone(`INSERT INTO usuarios.users(
-             nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos)
-            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}')`)
+             nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password)
+            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`)
 
         return res.status(200).json({ response: 'succes' })
     } catch (error) {
-        console.log(error)
+
         next(new AppError('Error interno del servidor: ' + error, 500))
     }
 }
@@ -59,7 +88,7 @@ const getUsuarios = async (req, res, next) => {
         )
         return res.status(200).json(users)
     } catch (error) {
-        console.log(error)
+
         next(new AppError('Error al intentar obtener los usuarios: ' + error, 500))
     }
 }
