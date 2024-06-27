@@ -27,7 +27,7 @@ const registrarProducto = async (req, res, next) => {
 
 const obtenerProductos = async (req, res, next) => {
     try {
-        const productos = await db.any(`SELECT *FROM inventario.producto `)
+        const productos = await db.any(`SELECT *FROM inventario.producto  pr WHERE pr.activo = true`)
 
         return res.status(200).json(productos)
     } catch (error) {
@@ -35,4 +35,16 @@ const obtenerProductos = async (req, res, next) => {
     }
 }
 
-module.exports = { registrarProducto, obtenerProductos }
+const eliminarProducto = async (req, res, next) => {
+    try {
+        const { idProducto } = req.params
+
+        await db.oneOrNone(`UPDATE  inventario.producto SET activo = false WHERE id = '${idProducto}'`)
+
+        return res.status(200).json({ response: 'ok' })
+    } catch (error) {
+        next(new AppError('Error al intentar eliminar el producto' + error.message, 500))
+    }
+}
+
+module.exports = { registrarProducto, obtenerProductos, eliminarProducto }
