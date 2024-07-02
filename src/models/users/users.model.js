@@ -1,4 +1,4 @@
-const { db } = require('../../coonfig/bd.config')
+const { db } = require('../../config/bd.config')
 const AppError = require('../../helpers/appError')
 const { generateToken } = require('../../helpers/autenticationToken')
 

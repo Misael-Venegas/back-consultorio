@@ -1,9 +1,9 @@
 const AppError = require('../../helpers/appError')
 const { generateToken } = require('../../helpers/autenticationToken')
-const { db } = require('../../coonfig/bd.config')
+const { db } = require('../../config/bd.config')
 const bcryptjs = require('bcryptjs')
 const crypto = require('crypto')
-
+const { enviarContrasenhaRegistro } = require('../../helpers/mails/mailContrasenhaRegistro')
 const inicarSesion = async (req, res, next) => {
     try {
         const { usuario, contrasena } = req.body;
@@ -72,7 +72,7 @@ const agregarUsuario = async (req, res, next) => {
         await db.oneOrNone(`INSERT INTO usuarios.users(
              nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password)
             VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`)
-
+        await enviarContrasenhaRegistro(next, cadena, correo, nombre + ' ' + aPaterno + ' ' + aMaterno)
         return res.status(200).json({ response: 'succes' })
     } catch (error) {
 
