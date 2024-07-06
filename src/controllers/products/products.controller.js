@@ -3,7 +3,7 @@ const AppError = require('../../helpers/appError')
 
 const registrarProducto = async (req, res, next) => {
     try {
-        //  console.log(req.body)
+        console.log('Agregar', req.body)
         const {
             nombreProducto,
             unidad,
@@ -27,7 +27,7 @@ const registrarProducto = async (req, res, next) => {
 
 const obtenerProductos = async (req, res, next) => {
     try {
-        const productos = await db.any(`SELECT *FROM inventario.producto  pr WHERE pr.activo = true`)
+        const productos = await db.any(`SELECT *FROM inventario.producto  pr WHERE pr.activo = true ORDER BY pr.nombre_producto`)
 
         return res.status(200).json(productos)
     } catch (error) {
@@ -46,5 +46,35 @@ const eliminarProducto = async (req, res, next) => {
         next(new AppError('Error al intentar eliminar el producto' + error.message, 500))
     }
 }
+const editarProducto = async (req, res, next) => {
+    try {
+        //console.log('Editar', req.body)
+        const {
+            id,
+            nombreProducto,
+            unidad,
+            cantidad,
+            descripcion,
+            precioUnitario,
+            importe,
+            precioVenta,
+            codigoBarras,
+            productoFarmacia
+        } = req.body
+        // console.log(id)
+        await db.oneOrNone(`UPDATE inventario.producto
+        SET nombre_producto='${nombreProducto}', cantidad=${cantidad},
+        unidad='${unidad}', descripcion='${descripcion}', precio_unitario=${precioUnitario}, 
+        importe=${importe}, precio_venta=${precioVenta}, codigo_barras='${codigoBarras}', producto_farmacia=${productoFarmacia}
+        WHERE id='${id}'`)
 
-module.exports = { registrarProducto, obtenerProductos, eliminarProducto }
+
+        return res.status(200).json({ response: 'ok' })
+
+    } catch (error) {
+        console.log(error)
+        next(new AppError('Error al intentar editar el prducto: ' + error.message, 500))
+    }
+}
+
+module.exports = { registrarProducto, obtenerProductos, eliminarProducto, editarProducto }
