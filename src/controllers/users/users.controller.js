@@ -73,36 +73,26 @@ const agregarUsuario = async (req, res, next) => {
       `select * from usuarios.users usr where usr.correo = '${correo}'`
     );
 
-        if (dataUsr.length > 0) {
-            return next(new AppError('Este correo ya fue registrado con otro usuario', 400))
-        }
-
-        const cadena = crypto.randomBytes(2).toString('hex')
-        const contrasenha = bcryptjs.hashSync(cadena, 8)
-
-        await db.oneOrNone(`INSERT INTO usuarios.users(
-             nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password)
-            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`)
-        await enviarContrasenhaRegistro(next, cadena, correo, nombre + ' ' + aPaterno + ' ' + aMaterno)
-        return res.status(200).json({ response: 'succes' })
-    } catch (error) {
-
-        next(new AppError('Error interno del servidor: ' + error, 500))
+    if (dataUsr.length > 0) {
+      return next(new AppError('Este correo ya fue registrado con otro usuario', 400))
     }
 
-    const cadena = crypto.randomBytes(2).toString("hex");
-    console.log(cadena);
-    const contrasenha = bcryptjs.hashSync(cadena, 8);
+    const cadena = crypto.randomBytes(2).toString('hex')
+    const contrasenha = bcryptjs.hashSync(cadena, 8)
 
     await db.oneOrNone(`INSERT INTO usuarios.users(
              nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password)
-            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`);
+            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`)
 
-    return res.status(200).json({ response: "succes" });
+    await enviarContrasenhaRegistro(next, cadena, correo, nombre + ' ' + aPaterno + ' ' + aMaterno)
+
+    return res.status(200).json({ response: 'succes' })
   } catch (error) {
-    next(new AppError("Error interno del servidor: " + error, 500));
+
+    next(new AppError('Error interno del servidor: ' + error, 500))
   }
-};
+}
+
 
 const getUsuarios = async (req, res, next) => {
   try {
