@@ -4,6 +4,7 @@ const { db } = require('../../config/bd.config')
 const bcryptjs = require('bcryptjs')
 const crypto = require('crypto')
 const { enviarContrasenhaRegistro } = require('../../helpers/mails/mailContrasenhaRegistro')
+
 const inicarSesion = async (req, res, next) => {
   try {
     const { usuario, contrasena } = req.body;
@@ -133,9 +134,24 @@ const editarUsuario = async (req, res, next) => {
 
     return res.status(200).json({ succes: "ok" });
   } catch (error) {
-    next(new AppError("Al intenr eliminar el usuario " + error, 500));
+    next(new AppError("Error: Al intentar eliminar el usuario " + error, 500));
   }
 };
+
+const cambiarContrasenhia = async (req, res, next) => {
+  try {
+
+    const { contrasenha } = req.body
+    const { id } = req.user
+
+    const encriptarContrasenhia = bcryptjs.hashSync(contrasenha, 8)
+
+    await db.oneOrNone(`UPDATE usuarios.users SET password = '${encriptarContrasenhia}' WHERE id = '${id}'`)
+    return res.status(200).json({ sucess: 'ok' })
+  } catch (error) {
+    next(new AppError("Error: Al intenatar cambiar la contraseña: " + error.message, 500))
+  }
+}
 
 module.exports = {
   inicarSesion,
@@ -144,4 +160,5 @@ module.exports = {
   getUsuarios,
   deleteUser,
   editarUsuario,
+  cambiarContrasenhia
 };
