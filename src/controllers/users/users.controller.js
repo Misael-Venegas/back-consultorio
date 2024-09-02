@@ -4,10 +4,12 @@ const { db } = require('../../config/bd.config')
 const bcryptjs = require('bcryptjs')
 const crypto = require('crypto')
 const { enviarContrasenhaRegistro } = require('../../helpers/mails/mailContrasenhaRegistro')
+const { enviarCodigoVendedor } = require('../../helpers/mails/mailCodigoVendedor')
 
 const inicarSesion = async (req, res, next) => {
   try {
     const { usuario, contrasena } = req.body;
+
     if (usuario === "root") {
       if (contrasena === "abcd.1234") {
         const usr = {
@@ -68,7 +70,7 @@ const obtenerRolesUsuarios = async (req, res, next) => {
 
 const agregarUsuario = async (req, res, next) => {
   try {
-    const { nombre, aPaterno, aMaterno, correo, telefono, rol, cumpleanhos } =
+    const { nombre, aPaterno, aMaterno, correo, telefono, rol, cumpleanhos, codigoVendedor } =
       req.body;
     const dataUsr = await db.any(
       `select * from usuarios.users usr where usr.correo = '${correo}'`
@@ -78,14 +80,23 @@ const agregarUsuario = async (req, res, next) => {
       return next(new AppError('Este correo ya fue registrado con otro usuario', 400))
     }
 
+    let codigoVentas = null;
+
+    if (codigoVendedor) {
+      codigoVentas = crypto.randomBytes(2).toString('hex')
+    }
+
     const cadena = crypto.randomBytes(2).toString('hex')
     const contrasenha = bcryptjs.hashSync(cadena, 8)
 
-    await db.oneOrNone(`INSERT INTO usuarios.users(
-             nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password)
-            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}', '${cumpleanhos}', '${contrasenha}')`)
 
-    await enviarContrasenhaRegistro(next, cadena, correo, nombre + ' ' + aPaterno + ' ' + aMaterno)
+
+    await db.oneOrNone(`INSERT INTO usuarios.users(
+             nombre, a_paterno, a_materno, correo, telefono, id_rol, fecha_cumpleanhos, password, codigo_vendedor)
+            VALUES ('${nombre}', '${aPaterno}', '${aMaterno}', '${correo}', '${telefono}', '${rol}',
+             '${cumpleanhos}', '${contrasenha}', ${codigoVendedor ? `'${codigoVentas}'` : null})`)
+
+    await enviarContrasenhaRegistro(next, cadena, correo, nombre + ' ' + aPaterno + ' ' + aMaterno, codigoVentas)
 
     return res.status(200).json({ response: 'succes' })
   } catch (error) {
@@ -98,7 +109,7 @@ const agregarUsuario = async (req, res, next) => {
 const getUsuarios = async (req, res, next) => {
   try {
     const users =
-      await db.any(`select usr.id, usr.nombre, usr.a_paterno,usr.a_materno, usr.correo, usr.telefono, usr.fecha_cumpleanhos, r.rol, usr.id_rol from usuarios.users usr
+      await db.any(`select usr.id, usr.nombre, usr.a_paterno,usr.a_materno, usr.correo, usr.telefono, usr.fecha_cumpleanhos, usr.codigo_vendedor, r.rol, usr.id_rol from usuarios.users usr
                                     INNER JOIN usuarios.rol r ON r.id = usr.id_rol	
                                     ORDER BY usr.nombre`);
     return res.status(200).json(users);
@@ -128,9 +139,24 @@ const editarUsuario = async (req, res, next) => {
       telefono,
       rol,
       cumpleanhos,
+      codigoVendedor
     } = req.body;
+
+    let codigoVentas = null
+
+    if (codigoVendedor) {
+      const { codigo_vendedor } = await db.oneOrNone(`SELECT usr.codigo_vendedor from usuarios.users usr where usr.id = '${id}'`)
+      if (codigo_vendedor) {
+        codigoVentas = codigo_vendedor;
+      } else {
+        codigoVentas = crypto.randomBytes(2).toString('hex')
+        await enviarCodigoVendedor(next, nombre + ' ' + aPaterno + ' ' + aMaterno, correo, codigoVentas)
+      }
+    }
+
     await db.oneOrNone(`UPDATE usuarios.users SET nombre='${nombre}', a_paterno='${aPaterno}', a_materno='${aMaterno}', correo='${correo}',
-        telefono='${telefono}', id_rol='${rol}', fecha_cumpleanhos='${cumpleanhos}' WHERE id='${id}'`);
+        telefono='${telefono}', id_rol='${rol}', fecha_cumpleanhos='${cumpleanhos}',
+       codigo_vendedor = ${codigoVendedor ? `'${codigoVentas}'` : null} WHERE id='${id}'`);
 
     return res.status(200).json({ succes: "ok" });
   } catch (error) {

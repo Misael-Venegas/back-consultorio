@@ -3,8 +3,7 @@ require('dotenv').config()
 const nodemailer = require('nodemailer')
 const { imageEyeconic } = require('../images/logoEyeconic')
 
-const enviarContrasenhaRegistro = async (next, contrasena, correo, nombre, codigoVentas) => {
-    //console.log(nombre, contrasena)
+const enviarCodigoVendedor = async (next, nombre, correo, codigo) => {
     try {
         let transporter = nodemailer.createTransport({
             host: 'smtp.googlemail.com',
@@ -22,17 +21,17 @@ const enviarContrasenhaRegistro = async (next, contrasena, correo, nombre, codig
         const mailOptions = {
             from: "Eyeconic Salud Visual",
             to: correo,
-            subject: "Registro al sistena de Eyeconic",
-            html: htmlMail(nombre, contrasena, correo, codigoVentas),
+            subject: "Código de vendedor Eyeconic",
+            html: htmlMail(nombre, codigo),
         }
 
         await transporter.sendMail(mailOptions)
     } catch (error) {
-        return next(new AppError('Error al intentar enviar el correo: ' + error.message, '500'))
+        return next(new AppError('Error al intentar enviar el código del vendedor por correo: ' + error.message, '500'))
     }
 }
 
-const htmlMail = (nombre, contrasenha, mail, codigoVentas) => {
+const htmlMail = (nombre, codigoVentas) => {
     return ` 
      <div data-link='class{getClass:IsBodyExpanded}' class='c-ReadMessagePartBody'>
       <div class='readMsgBody'>
@@ -75,29 +74,20 @@ const htmlMail = (nombre, contrasenha, mail, codigoVentas) => {
                                               </tr>
                                               <tr> 
                                                 <td> 
-                                                  <h4> Hola ${nombre} bienvenid@ a la familia Eyeconic Salud Visual.</h4> 
+                                                  <h4> Hola ${nombre}.</h4> 
                                                 </td> 
                                               </tr>
                                               <tr> 
                                                 <td> 
-                                                  Por este medio te adjuntamos tus credenciales de acceso al sistema.<br><br>
+                                                  Por este medio te adjuntamos tu código de vendedor.<br><br>
                                                 </td> 
                                               </tr>
-                                              <tr> 
-                                                <td> 
-                                                  Usuario: ${mail} 
-                                                </td> 
-                                              </tr>
-                                              <tr> 
-                                                <td> 
-                                                  Contraseña: ${contrasenha} 
-                                                </td> 
-                                              </tr>
+                                           
                                               ${codigoVentas ? `<tr><td>Código de vendedor: ${codigoVentas}</td></tr>` : ''}
                                               <tr> 
                                                 <td> 
                                                 <p>
-                                                <strong> Nota: Te recomendamos cambiar esta contraseña una vez ingreses al sistema.</strong> 
+                                                <strong> Nota: Este código es único y te recomendamos no compartirlo con nadie.</strong> 
                                                 </p>
                                                 </td> 
                                               </tr>
@@ -126,4 +116,5 @@ const htmlMail = (nombre, contrasenha, mail, codigoVentas) => {
       </table>
      `
 }
-module.exports = { enviarContrasenhaRegistro }
+
+module.exports = {enviarCodigoVendedor}
