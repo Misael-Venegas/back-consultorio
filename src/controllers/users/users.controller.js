@@ -28,7 +28,10 @@ const inicarSesion = async (req, res, next) => {
     }
 
     const usr = await db.oneOrNone(
-      `select * from usuarios.users us WHERE us.correo = '${usuario}'`
+      `select us.id, us.nombre, us.a_paterno, us.a_materno, us.correo,
+      us.telefono, us.id_rol, us.fecha_cumpleanhos, us."password", us.codigo_vendedor, r.rol
+      from usuarios.users us
+      inner join usuarios.rol r on r.id = us.id_rol WHERE us.correo = '${usuario}' ORDER BY us.nombre`
     );
 
     if (!usr) {
@@ -49,6 +52,7 @@ const inicarSesion = async (req, res, next) => {
         telefono: usr.telefono,
         id_rol: usr.id_rol,
         fecha_cumpleanhos: usr.fecha_cumpleanhos,
+        rol: usr.rol
       };
       const token = generateToken(datosToken);
       return res.status(200).json({ token });
