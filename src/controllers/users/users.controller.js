@@ -13,7 +13,7 @@ const inicarSesion = async (req, res, next) => {
     if (usuario === "root") {
       if (contrasena === "abcd.1234") {
         const usr = {
-          usuario,
+          nombre: usuario,
           correo: "",
           telefono: "",
           rol: "root",
