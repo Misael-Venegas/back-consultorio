@@ -21,7 +21,7 @@ const realizarVenta = async (req, res, next) => {
         const codigo = await db.oneOrNone(`select usr.codigo_vendedor from usuarios.users usr WHERE usr.codigo_vendedor = '${codigoVendedor}'`)
 
         if (!codigo) {
-            return next(new AppError('Código de vendedor incorrecto', 500)); // Asegúrate de usar return para detener la ejecución
+            return next(new AppError('Código de vendedor incorrecto', 500)); 
         }
 
         const validarStock = await validarStockProductos(listaProductos, next)
