@@ -5,7 +5,7 @@ const bcryptjs = require('bcryptjs')
 const crypto = require('crypto')
 const { enviarContrasenhaRegistro } = require('../../helpers/mails/mailContrasenhaRegistro')
 const { enviarCodigoVendedor } = require('../../helpers/mails/mailCodigoVendedor')
-
+const { correoRecuperarContrasenha } = require('../../helpers/mails/mailRecuperarContrasenha')
 const inicarSesion = async (req, res, next) => {
   try {
     const { usuario, contrasena } = req.body;
@@ -183,6 +183,29 @@ const cambiarContrasenhia = async (req, res, next) => {
   }
 }
 
+const recuperarContrasenha = async (req, res, next) => {
+  try {
+    const { correoElectronico } = req.params
+
+    const correoUsuario = await db.oneOrNone(`select usr.correo,  usr.nombre from usuarios.users usr WHERE usr.correo = '${correoElectronico}'`)
+    console.log(correoUsuario)
+    if (correoUsuario == null) {
+      throw new Error('El correo que ingresaste no existe')
+    }
+
+    const cadena = crypto.randomBytes(2).toString('hex')
+    const contrasenha = bcryptjs.hashSync(cadena, 8)
+
+    await correoRecuperarContrasenha(next,correoUsuario.nombre, correoElectronico, cadena)
+
+    await db.oneOrNone(`UPDATE usuarios.users SET password = '${contrasenha}' WHERE correo = '${correoElectronico}'`)
+
+    return res.status(200).json({succes: 'ok'})
+  } catch (error) {
+    next(new AppError(error.message, 500))
+  }
+}
+
 module.exports = {
   inicarSesion,
   agregarUsuario,
@@ -190,5 +213,6 @@ module.exports = {
   getUsuarios,
   deleteUser,
   editarUsuario,
-  cambiarContrasenhia
+  cambiarContrasenhia,
+  recuperarContrasenha
 };
