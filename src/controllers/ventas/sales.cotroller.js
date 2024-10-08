@@ -16,20 +16,20 @@ const obtenerListaProductosPorCodigoDeBarras = async (req, res, next) => {
 
 const realizarVenta = async (req, res, next) => {
     try {
-        const { listaProductos, totalVenta, codigoVendedor, codigoTicketTerminal, pagoEfectivo } = req.body
+        const { listaProductos, totalVenta, codigoVendedor, codigoTicketTerminal, metodoPago, telefonoCliente } = req.body
 
         const codigo = await db.oneOrNone(`select usr.codigo_vendedor from usuarios.users usr WHERE usr.codigo_vendedor = '${codigoVendedor}'`)
 
         if (!codigo) {
-            return next(new AppError('Código de vendedor incorrecto', 500)); 
+            return next(new AppError('Código de vendedor incorrecto', 500));
         }
 
         const validarStock = await validarStockProductos(listaProductos, next)
 
         if (validarStock) {
             const { id } = await db.oneOrNone(`INSERT INTO inventario.ventas(
-                    codigo_vendedor, total, pago_efectivo, codigo_pago_digital)
-                    VALUES ( '${codigoVendedor}', ${totalVenta}, ${pagoEfectivo}, '${codigoTicketTerminal}') 
+                    codigo_vendedor, total, codigo_pago_digital, tipo_pago, telefono_cliente)
+                    VALUES ('${codigoVendedor}', ${totalVenta}, ${codigoTicketTerminal ? `'${codigoTicketTerminal}'`: null}, '${metodoPago}', ${telefonoCliente ? `'${telefonoCliente}'` : null}) 
                     returning id`)
 
             for (const element of listaProductos) {
@@ -68,6 +68,7 @@ const realizarVenta = async (req, res, next) => {
 
 
     } catch (error) {
+        console.log(error)
         return next(new AppError(error.message, 500))
     }
 }
