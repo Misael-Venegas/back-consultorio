@@ -72,9 +72,10 @@ const editarProducto = async (req, res, next) => {
         return res.status(200).json({ response: 'ok' })
 
     } catch (error) {
-        console.log(error)
         next(new AppError('Error al intentar editar el prducto: ' + error.message, 500))
     }
 }
+
+
 
 module.exports = { registrarProducto, obtenerProductos, eliminarProducto, editarProducto }
