@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser, editarUsuario, cambiarContrasenhia } = require('../controllers/users/users.controller')
 const { obtenerProductos, registrarProducto, eliminarProducto, editarProducto } = require('../controllers/products/products.controller')
-const { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo } = require('../controllers/dashboard/dashboard.controller')
+const { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo, obtenerTotalVentasPorDia } = require('../controllers/dashboard/dashboard.controller')
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
     .get('/obtenerUsuarios', getUsuarios)
@@ -15,6 +15,7 @@ router.post('/agregarUsuario', agregarUsuario)
     .post('/cambiar-contrasenhia', cambiarContrasenhia)
     .get('/obtener-stock-minimo', obtenerProductosStockMinimo)
     .get('/obtener-lista-cumpleanhos', obtnerUsuariosQueCumplenAnhos)
+    .post('/total-ventas-por-dia', obtenerTotalVentasPorDia)
 
 
 module.exports = router

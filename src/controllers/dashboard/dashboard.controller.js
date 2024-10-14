@@ -7,7 +7,7 @@ const obtnerUsuariosQueCumplenAnhos = async (req, res, next) => {
                             TO_CHAR(usr.fecha_cumpleanhos::date, 'dd-mm-yyyy') fecha_cumpleanhos from usuarios.users usr
                             where EXTRACT(MONTH FROM usr.fecha_cumpleanhos) = EXTRACT(MONTH FROM CURRENT_DATE)
                             ORDER BY EXTRACT(DAY FROM usr.fecha_cumpleanhos)`)
-              
+
         return res.status(200).json(response)
     } catch (error) {
         next(new AppError(error.message, 500))
@@ -17,9 +17,24 @@ const obtenerProductosStockMinimo = async (req, res, next) => {
     try {
         const datosStock = await db.any(`select pro.nombre_producto, pro.codigo_barras, pro.cantidad 
             from inventario.producto pro WHERE pro.cantidad <= 10 AND pro.activo = true`)
+
         return res.status(200).json(datosStock)
     } catch (error) {
         next(new AppError(error.message))
     }
 }
-module.exports = { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo }
+
+const obtenerTotalVentasPorDia = async (req, res, next) => {
+    try {
+        const { fecha } = req.body
+        console.log(fecha)
+        const response = await db.oneOrNone(`
+          select SUM(total) total from inventario.ventas v WHERE DATE(v.fecha_venta) = '${fecha}'
+        `)
+        console.log(response)
+        return res.status(200).json(response)
+    } catch (error) {
+        next(new AppError(error.message))
+    }
+}
+module.exports = { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo, obtenerTotalVentasPorDia }
