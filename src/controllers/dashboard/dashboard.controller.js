@@ -56,9 +56,9 @@ const obtenerUsuarioConMasVentasPorMes = async (req, res, next) => {
 
 const obtenerTotalVentasPorMes = async (req, res, next) => {
     try {
-        
+
         const { mes, anhio } = req.body
-        
+
         const response = await db.oneOrNone(`select SUM(v.total) total from inventario.ventas v
                         WHERE EXTRACT(MONTH FROM v.fecha_venta) = '${mes}' 
                         AND EXTRACT(YEAR FROM v.fecha_venta) = '${anhio}'`)
@@ -70,4 +70,28 @@ const obtenerTotalVentasPorMes = async (req, res, next) => {
     }
 }
 
-module.exports = { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo, obtenerTotalVentasPorDia, obtenerUsuarioConMasVentasPorMes, obtenerTotalVentasPorMes }
+const obtenerUsuarioMayorVentasPorMes = async (req, res, next) => {
+    try {
+        const { mes, anhio } = req.body
+
+        const response = await db.oneOrNone(`
+            SELECT CONCAT(usr.nombre, ' ' ,usr.a_paterno,' ', usr.a_materno) nombre_empleado, COUNT(v.codigo_vendedor) total_ventas from inventario.ventas v
+                        JOIN usuarios.users usr ON usr.codigo_vendedor = v.codigo_vendedor
+                        WHERE EXTRACT(MONTH from v.fecha_venta) = '${mes}' AND EXTRACT(YEAR from v.fecha_venta) = '${anhio}'
+                        GROUP BY usr.nombre, usr.a_paterno, usr.a_materno 
+                        LIMIT 1
+            `)
+        return res.status(200).json(response)
+    } catch (error) {
+        next(new AppError(error.message))
+    }
+}
+
+module.exports = {
+    obtnerUsuariosQueCumplenAnhos,
+    obtenerProductosStockMinimo,
+    obtenerTotalVentasPorDia,
+    obtenerUsuarioConMasVentasPorMes,
+    obtenerTotalVentasPorMes,
+    obtenerUsuarioMayorVentasPorMes
+}

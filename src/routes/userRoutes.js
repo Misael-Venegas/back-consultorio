@@ -3,7 +3,8 @@ const router = express.Router()
 const { agregarUsuario, obtenerRolesUsuarios, getUsuarios, deleteUser, editarUsuario, cambiarContrasenhia } = require('../controllers/users/users.controller')
 const { obtenerProductos, registrarProducto, eliminarProducto, editarProducto } = require('../controllers/products/products.controller')
 const { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo,
-    obtenerTotalVentasPorDia, obtenerUsuarioConMasVentasPorMes, obtenerTotalVentasPorMes } = require('../controllers/dashboard/dashboard.controller')
+    obtenerTotalVentasPorDia, obtenerUsuarioConMasVentasPorMes,
+    obtenerTotalVentasPorMes, obtenerUsuarioMayorVentasPorMes } = require('../controllers/dashboard/dashboard.controller')
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
     .get('/obtenerUsuarios', getUsuarios)
@@ -19,6 +20,7 @@ router.post('/agregarUsuario', agregarUsuario)
     .post('/total-ventas-por-dia', obtenerTotalVentasPorDia)
     .post('/obtener-usuario-con-mayor-ventas-por-dia', obtenerUsuarioConMasVentasPorMes)
     .post('/obtener-total-ventas-por-mes', obtenerTotalVentasPorMes)
+    .post('/obtener-usuarios-mayor-ventas-por-mes', obtenerUsuarioMayorVentasPorMes)
 
 
 module.exports = router
