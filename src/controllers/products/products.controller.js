@@ -3,7 +3,6 @@ const AppError = require('../../helpers/appError')
 
 const registrarProducto = async (req, res, next) => {
     try {
-        console.log('Agregar', req.body)
         const {
             nombreProducto,
             unidad,
