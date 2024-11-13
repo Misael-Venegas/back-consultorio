@@ -5,7 +5,7 @@ const { obtenerProductos, registrarProducto, eliminarProducto, editarProducto } 
 const { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo,
     obtenerTotalVentasPorDia, obtenerUsuarioConMasVentasPorMes,
     obtenerTotalVentasPorMes, obtenerUsuarioMayorVentasPorMes } = require('../controllers/dashboard/dashboard.controller')
-const { agendarCita } = require('../controllers/agenda/agenda.controller')
+const { agendarCita, obtenerCitas } = require('../controllers/agenda/agenda.controller')
 
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
@@ -24,6 +24,7 @@ router.post('/agregarUsuario', agregarUsuario)
     .post('/obtener-total-ventas-por-mes', obtenerTotalVentasPorMes)
     .post('/obtener-usuarios-mayor-ventas-por-mes', obtenerUsuarioMayorVentasPorMes)
     .post('/agendar-cita', agendarCita)
+    .get('/obtener-citas', obtenerCitas)
 
 
 module.exports = router
