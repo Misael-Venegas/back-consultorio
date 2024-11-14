@@ -33,7 +33,7 @@ const agendarCita = async (req, res, next) => {
         console.log(idPaciente)
         await db.oneOrNone(`INSERT INTO agenda.agenda(
                     fecha, hora, motivo_consulta, id_usuario, estado, id_paciente)
-                    VALUES ( '${fecha}', '${hora}', '${motivo}', '84e0f17d-c53d-43ec-8a7b-7a36f0628b61', 1, '${idPaciente}');`
+                    VALUES ( '${fecha}', '${hora}', '${motivo}', '${idUsuario}', 1, '${idPaciente}');`
         )
 
         return res.status(200).json({ response: "ok" })
@@ -45,13 +45,29 @@ const agendarCita = async (req, res, next) => {
 
 const obtenerCitas = async (req, res, next) => {
     try {
-        const response = await db.any(`select ag.id, ag.fecha, ag.hora, ag.motivo_consulta, CONCAT(pa.nombre,' ',pa.apaterno,' ',pa.amaterno) paciente, pa.telefono, pa.fecha_naciemiento  from agenda.agenda ag
-            INNER JOIN agenda.pacientes pa ON pa.id = ag.id_paciente where ag.estado =1`)
-       
+        const response = await db.any(`select ag.id, to_char(ag.fecha, 'YYYY-MM-DD') fecha, ag.hora, ag.motivo_consulta, CONCAT(pa.nombre,' ',pa.apaterno,' ',pa.amaterno) paciente,
+            pa.telefono, to_char(pa.fecha_naciemiento, 'YYYY-MM-DD') fecha_naciemiento, CONCAT(usr.nombre, ' ', usr.a_paterno, ' ', usr.a_paterno) especialista  from agenda.agenda ag
+            INNER JOIN agenda.pacientes pa ON pa.id = ag.id_paciente 
+			INNER JOIN usuarios.users usr ON usr.id = ag.id_usuario
+			where ag.estado =1 ORDER BY ag.fecha, ag.hora`)
+
         return res.status(200).json(response)
     } catch (error) {
         next(new AppError('Error al intentar obtner las citas' + error.message, 500))
     }
 }
 
-module.exports = { agendarCita, obtenerCitas }
+const obtenerEspecialistas = async (req, res, next) => {
+    try {
+        const response = await db.any(`
+        select usr.id, CONCAT(usr.nombre, ' ', usr.a_paterno, ' ', usr.a_materno) nombre, r.rol from usuarios.users usr
+                 INNER JOIN usuarios.rol r ON r.id = usr.id_rol
+                WHERE r.rol='Especialista'
+        `)
+        return res.status(200).json(response)
+    } catch (error) {
+        next(new AppError('Error al intentar obtner a los especialistas' + error.message, 500))
+    }
+}
+
+module.exports = { agendarCita, obtenerCitas, obtenerEspecialistas }
