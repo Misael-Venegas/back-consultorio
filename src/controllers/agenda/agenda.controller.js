@@ -29,8 +29,6 @@ const agendarCita = async (req, res, next) => {
             idPaciente = id
         }
 
-
-        console.log(idPaciente)
         await db.oneOrNone(`INSERT INTO agenda.agenda(
                     fecha, hora, motivo_consulta, id_usuario, estado, id_paciente)
                     VALUES ( '${fecha}', '${hora}', '${motivo}', '${idUsuario}', 1, '${idPaciente}');`
