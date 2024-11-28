@@ -43,11 +43,13 @@ const agendarCita = async (req, res, next) => {
 
 const obtenerCitas = async (req, res, next) => {
     try {
+        const { fecha } = req.params
+        console.log(fecha)
         const response = await db.any(`select ag.id, to_char(ag.fecha, 'YYYY-MM-DD') fecha, ag.hora, ag.motivo_consulta, CONCAT(pa.nombre,' ',pa.apaterno,' ',pa.amaterno) paciente,
             pa.telefono, to_char(pa.fecha_naciemiento, 'YYYY-MM-DD') fecha_naciemiento, CONCAT(usr.nombre, ' ', usr.a_paterno, ' ', usr.a_paterno) especialista  from agenda.agenda ag
             INNER JOIN agenda.pacientes pa ON pa.id = ag.id_paciente 
 			INNER JOIN usuarios.users usr ON usr.id = ag.id_usuario
-			where ag.estado =1 ORDER BY ag.fecha, ag.hora`)
+			where ag.fecha = '${fecha}' AND ag.estado = 1 ORDER BY ag.fecha, ag.hora`)
 
         return res.status(200).json(response)
     } catch (error) {
@@ -68,4 +70,17 @@ const obtenerEspecialistas = async (req, res, next) => {
     }
 }
 
-module.exports = { agendarCita, obtenerCitas, obtenerEspecialistas }
+const cancelarCita = async (req, res, next) => {
+    try {
+        const { id } = req.params
+       
+        db.oneOrNone(`
+            UPDATE agenda.agenda SET estado=2 WHERE id = '${id}' 
+            `)
+        return res.status(200).json({ response: 'ok' })
+    } catch (error) {
+        next(new AppError('Error al actualizar el estado de la cita' + error.message, 500))
+    }
+}
+
+module.exports = { agendarCita, obtenerCitas, obtenerEspecialistas, cancelarCita }
