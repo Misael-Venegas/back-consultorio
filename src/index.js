@@ -19,11 +19,11 @@ app.use('/', authenticateToken, userRoutes)
 
 app.use(globalErrorHandler)
 
-/*
-app.listen(port, () => {
+
+/*app.listen(port, () => {
     console.log(`Server is ready in PORT: ${port}`)
-})
-*/
+})*/
+
 
 
 app.listen(port, HOST, () => {

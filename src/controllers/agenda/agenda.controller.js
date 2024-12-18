@@ -134,7 +134,7 @@ const obtenerCitasUsuario = async (req, res, next) => {
         const { idUsuario } = req.params
         const response = await db.any(`select ag.id, to_char(ag.fecha, 'YYYY-MM-DD') fecha, ag.hora, ag.motivo_consulta, CONCAT(pa.nombre,' ',pa.apaterno,' ',pa.amaterno) paciente,
             pa.telefono, to_char(pa.fecha_naciemiento, 'YYYY-MM-DD') fecha_naciemiento, ag.estado, 
-	        usr.id id_especialista, CONCAT(usr.nombre, ' ', usr.a_paterno, ' ', usr.a_paterno) especialista
+	        usr.id id_especialista, CONCAT(usr.nombre, ' ', usr.a_paterno, ' ', usr.a_materno) especialista
 			from agenda.agenda ag 
 			INNER JOIN agenda.pacientes pa ON pa.id = ag.id_paciente     
 			INNER JOIN usuarios.users usr ON usr.id = ag.id_usuario
