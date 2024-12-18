@@ -5,7 +5,7 @@ const { obtenerProductos, registrarProducto, eliminarProducto, editarProducto } 
 const { obtnerUsuariosQueCumplenAnhos, obtenerProductosStockMinimo,
     obtenerTotalVentasPorDia, obtenerUsuarioConMasVentasPorMes,
     obtenerTotalVentasPorMes, obtenerUsuarioMayorVentasPorMes } = require('../controllers/dashboard/dashboard.controller')
-const { agendarCita, obtenerCitas, obtenerEspecialistas, cancelarCita, aprobarCita, obtenerCitasPorEspecialista } = require('../controllers/agenda/agenda.controller')
+const { agendarCita, obtenerCitas, obtenerEspecialistas, cancelarCita, aprobarCita, obtenerCitasPorEspecialista, editarCita } = require('../controllers/agenda/agenda.controller')
 const { filtrarPacientes } = require('../controllers/agenda/pacientes.controller')
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
@@ -30,6 +30,6 @@ router.post('/agregarUsuario', agregarUsuario)
     .get('/cancalar-cita/:id', cancelarCita)
     .get('/aprobar-cita/:id', aprobarCita)
     .get('/obtener-citas-por-especialista/:idEspecialista', obtenerCitasPorEspecialista)
-
+    .post('/editar-cita', editarCita)
 
 module.exports = router
