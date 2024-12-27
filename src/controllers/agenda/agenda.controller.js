@@ -18,6 +18,12 @@ const agendarCita = async (req, res, next) => {
             fechaNacimientoPaciente
         } = req.body
 
+        const resultado = await validarCitaExistente(fecha, hora)
+        if (resultado) {
+            throw new Error("Ya existe una reservación con esta fecha y hora.")
+        }
+
+
         if (pacienteNuevo) {
             const { id } = await db.oneOrNone(`
                 INSERT INTO agenda.pacientes(
@@ -117,6 +123,10 @@ const obtenerCitasPorEspecialista = async (req, res, next) => {
 const editarCita = async (req, res, next) => {
     try {
         const datos = req.body
+        const resultado = await validarCitaExistente(datos.fecha, datos.hora)
+        if (resultado) {
+            throw new Error("Ya existe una reservación con esta fecha y hora.")
+        }
 
         const response = await db.oneOrNone(`
             UPDATE agenda.agenda
@@ -143,6 +153,11 @@ const obtenerCitasUsuario = async (req, res, next) => {
     } catch (error) {
         next(new AppError('Error al intentar editar la cita ' + error.message, 500))
     }
+}
+
+const validarCitaExistente = async (fecha, hora) => {
+    const resultado = await db.oneOrNone(`select ag.id from agenda.agenda ag where ag.fecha = '${fecha}' AND ag.hora = '${hora}' AND ag.estado=1 `)
+    return resultado
 }
 
 module.exports = { agendarCita, obtenerCitas, obtenerEspecialistas, cancelarCita, aprobarCita, obtenerCitasPorEspecialista, editarCita, obtenerCitasUsuario }
