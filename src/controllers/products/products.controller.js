@@ -1,8 +1,10 @@
 const { db } = require('../../config/bd.config')
 const AppError = require('../../helpers/appError')
+const { guardarImagenes } = require('../../helpers/guardarImagenes')
 
 const registrarProducto = async (req, res, next) => {
     try {
+        console.log('body', req.body)
         const {
             nombreProducto,
             unidad,
@@ -12,12 +14,25 @@ const registrarProducto = async (req, res, next) => {
             importe,
             precioVenta,
             codigoBarras,
-            productoFarmacia
+            productoFarmacia,
+            ventaExterna,
+            image
         } = req.body
 
-        await db.oneOrNone(`INSERT INTO inventario.producto(
-                 nombre_producto, cantidad, unidad, descripcion, precio_unitario, importe, precio_venta, codigo_barras, producto_farmacia)
-                VALUES ( '${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia})`)
+        // return
+
+        if (ventaExterna) {
+            const idImagen = await guardarImagenes(image)
+            await db.oneOrNone(`INSERT INTO inventario.producto(
+                nombre_producto, cantidad, unidad, descripcion, precio_unitario, importe, precio_venta, codigo_barras, producto_farmacia, venta_externa, id_image)
+               VALUES ( '${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia}, ${ventaExterna}, '${idImagen}')`)
+
+        } else {
+            await db.oneOrNone(`INSERT INTO inventario.producto(
+                nombre_producto, cantidad, unidad, descripcion, precio_unitario, importe, precio_venta, codigo_barras, producto_farmacia)
+               VALUES ( '${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia})`)
+        }
+
         return res.status(200).json({ response: 'Ok' })
     } catch (error) {
         next(new AppError('Error al intentarn registrar un producto ' + error.message, 500))
