@@ -4,7 +4,7 @@ const { guardarImagenes } = require('../../helpers/guardarImagenes')
 
 const registrarProducto = async (req, res, next) => {
     try {
-        console.log('body', req.body)
+        //console.log('body', req.body)
         const {
             nombreProducto,
             unidad,
@@ -35,6 +35,7 @@ const registrarProducto = async (req, res, next) => {
 
         return res.status(200).json({ response: 'Ok' })
     } catch (error) {
+        console.log(error)
         next(new AppError('Error al intentarn registrar un producto ' + error.message, 500))
     }
 }
