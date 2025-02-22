@@ -4,7 +4,6 @@ const { guardarImagenes } = require('../../helpers/guardarImagenes')
 
 const registrarProducto = async (req, res, next) => {
     try {
-        //console.log('body', req.body)
         const {
             nombreProducto,
             unidad,
@@ -19,7 +18,6 @@ const registrarProducto = async (req, res, next) => {
             image
         } = req.body
 
-        // return
 
         if (ventaExterna) {
             const idImagen = await guardarImagenes(image)
