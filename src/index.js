@@ -8,14 +8,14 @@ const app = express()
 const userRoutes = require('./routes/userRoutes')
 const routeWithoutSecurity = require('./routes/routesWithoutAutentication')
 const globalErrorHandler = require('./middlewares/errorHandler')
+
 //Iniucia configuracion del server 
+
 app.use(express.json())
 app.use(cors())
-
 const port = process.env.PORT
 const HOST = '0.0.0.0'
-
-const imagePath = path.join(__dirname, "../../public/imagenesProductos"); 
+const imagePath = path.join(__dirname, "../../public/imagenesProductos");
 console.log("Sirviendo imágenes desde:", imagePath); // Para depuración
 app.use("/imagenesProductos", express.static(imagePath));
 

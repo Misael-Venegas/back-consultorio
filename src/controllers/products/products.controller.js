@@ -4,6 +4,7 @@ const { guardarImagenes } = require('../../helpers/guardarImagenes')
 
 const registrarProducto = async (req, res, next) => {
     try {
+     
         const {
             nombreProducto,
             unidad,
@@ -14,29 +15,32 @@ const registrarProducto = async (req, res, next) => {
             precioVenta,
             codigoBarras,
             productoFarmacia,
-            ventaExterna,
-            image
-        } = req.body
+            ventaExterna
+        } = req.body;
 
+        let idImagen = null
 
-        if (ventaExterna) {
-            const idImagen = await guardarImagenes(image)
+        if (req.file) {
+            idImagen = await guardarImagenes(req.file.path) // Nombre del archivo guardado
+        }
+
+        if (ventaExterna && idImagen) {
             await db.oneOrNone(`INSERT INTO inventario.producto(
                 nombre_producto, cantidad, unidad, descripcion, precio_unitario, importe, precio_venta, codigo_barras, producto_farmacia, venta_externa, id_image)
-               VALUES ( '${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia}, ${ventaExterna}, '${idImagen}')`)
-
+               VALUES ('${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia}, ${ventaExterna}, '${idImagen}')`);
         } else {
             await db.oneOrNone(`INSERT INTO inventario.producto(
                 nombre_producto, cantidad, unidad, descripcion, precio_unitario, importe, precio_venta, codigo_barras, producto_farmacia)
-               VALUES ( '${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia})`)
+               VALUES ('${nombreProducto}', ${cantidad}, '${unidad}', '${descripcion}', ${precioUnitario}, ${importe}, ${precioVenta}, '${codigoBarras}', ${productoFarmacia})`);
         }
 
-        return res.status(200).json({ response: 'Ok' })
+        return res.status(200).json({ response: 'Ok' });
     } catch (error) {
-        console.log(error)
-        next(new AppError('Error al intentarn registrar un producto ' + error.message, 500))
+        console.error(error);
+        next(new AppError('Error al intentar registrar un producto: ' + error.message, 500));
     }
-}
+};
+
 
 const obtenerProductos = async (req, res, next) => {
     try {
