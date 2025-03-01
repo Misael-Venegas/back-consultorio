@@ -45,7 +45,7 @@ const agendarCita = async (req, res, next) => {
                 edadPaciente || null
             ];
             const { id } = await db.oneOrNone(query, values);
-            
+
             idPaciente = id
         }
 
@@ -71,7 +71,7 @@ const obtenerCitas = async (req, res, next) => {
 			from agenda.agenda ag 
 			INNER JOIN agenda.pacientes pa ON pa.id = ag.id_paciente     
 			INNER JOIN usuarios.users usr ON usr.id = ag.id_usuario
-			where ag.fecha = '${fecha}' AND (ag.estado = 1 OR ag.estado = 2 ) ORDER BY ag.fecha, ag.hora`)
+			where ag.fecha = '${fecha}' AND (ag.estado = 1 OR ag.estado = 2 OR ag.estado = 4) ORDER BY ag.fecha, ag.hora`)
 
         return res.status(200).json(response)
     } catch (error) {
@@ -107,10 +107,14 @@ const cancelarCita = async (req, res, next) => {
 
 const aprobarCita = (req, res, next) => {
     try {
-        const { id } = req.params
 
+        // 1 registrada
+        // 2 concluida
+        // 3 cancelada
+        // 4 no asistio
+        const { id, tipo } = req.params
         db.oneOrNone(`
-            UPDATE agenda.agenda SET estado=2 WHERE id = '${id}' 
+            UPDATE agenda.agenda SET estado=${tipo} WHERE id = '${id}' 
             `)
         return res.status(200).json({ response: 'ok' })
     } catch (error) {
