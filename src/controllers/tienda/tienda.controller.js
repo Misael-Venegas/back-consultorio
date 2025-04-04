@@ -1,15 +1,16 @@
 const AppError = require("../../helpers/appError")
 const { db } = require('../../config/bd.config')
-const Stripe = require('stripe')
+
 require('dotenv').config();
 
 
 const obtenerProductosTienda = async (req, res, next) => {
     try {
         const respuesta = await db.any(`
-                        SELECT * FROM inventario.producto pr
+                       SELECT pr.id, pr.nombre_producto, pr.cantidad, pr.unidad, pr.descripcion, pr.precio_unitario, pr.importe,
+	                    pr.precio_venta, pr.codigo_barras, pr.producto_farmacia, pr.venta_externa, img.id id_imagen, img.url FROM inventario.producto pr
                         INNER JOIN inventario.imagenes img ON img.id = pr.id_image
-                        WHERE pr.venta_externa = true 
+                        WHERE pr.venta_externa = true AND pr.activo =true
                      `)
 
         return res.status(200).json(respuesta)
@@ -18,21 +19,5 @@ const obtenerProductosTienda = async (req, res, next) => {
     }
 }
 
-const realizarPagoEnLinea = async (req, res) => {
-    try {
 
-        const stripe = Stripe(process.env.SECRET_STRIPE_KEY)
-
-        const { amount, currency } = req.body;
-
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount,
-            currency,
-        });
-        res.json({ clientSecret: paymentIntent.client_secret });
-    } catch (error) {
-        next(new AppError(error.message))
-    }
-}
-
-module.exports = { obtenerProductosTienda, realizarPagoEnLinea }
+module.exports = { obtenerProductosTienda }

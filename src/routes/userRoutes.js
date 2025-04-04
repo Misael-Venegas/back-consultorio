@@ -9,6 +9,7 @@ const { agendarCita, obtenerCitas, obtenerEspecialistas, cancelarCita, aprobarCi
 const { filtrarPacientes } = require('../controllers/agenda/pacientes.controller')
 
 const { upload } = require('../helpers/saveImages')
+
 router.post('/agregarUsuario', agregarUsuario)
     .get('/getRol', obtenerRolesUsuarios)
     .get('/obtenerUsuarios', getUsuarios)
